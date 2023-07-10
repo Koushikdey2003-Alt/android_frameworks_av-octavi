@@ -154,7 +154,8 @@ status_t CameraSource::isCameraAvailable(
 
     if (camera == 0) {
         mCamera = Camera::connect(cameraId, clientName, clientUid, clientPid,
-                /*targetSdkVersion*/__ANDROID_API_FUTURE__, /*overrideToPortrait*/true);
+                /*targetSdkVersion*/__ANDROID_API_FUTURE__, /*overrideToPortrait*/false,
+                /*forceSlowJpegMode*/false);
         if (mCamera == 0) return -EBUSY;
         mCameraFlags &= ~FLAGS_HOT_CAMERA;
     } else {
@@ -493,6 +494,10 @@ status_t CameraSource::initBufferQueue(uint32_t width, uint32_t height,
     bufferCount += kConsumerBufferCount;
 
     mVideoBufferConsumer = new BufferItemConsumer(consumer, usage, bufferCount);
+    if (mVideoBufferConsumer == nullptr) {
+        return -1;
+    }
+
     mVideoBufferConsumer->setName(String8::format("StageFright-CameraSource"));
     mVideoBufferProducer = producer;
 
